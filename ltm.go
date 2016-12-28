@@ -758,16 +758,20 @@ func (b *BigIP) Pools() (*Pools, error) {
 	return &pools, nil
 }
 
-// PoolMembers returns a list of pool members (nodes) for the given pool.
-func (b *BigIP) PoolMembers(name string) (*Nodes, error) {
+// PoolMembers returns a list of pool members for the given pool.
+func (b *BigIP) PoolMembers(name string) ([]Node, error) {
 	var nodes Nodes
-
-	err, _ := b.getForEntity(&nodes, uriLtm, uriPool)
+	members := []Node{}
+	err, _ := b.getForEntity(&nodes, uriLtm, uriPool, name, "members")
 	if err != nil {
 		return nil, err
 	}
 
-	return &nodes, nil
+	for _, m := range nodes.Nodes {
+		members = append(members, m)
+	}
+
+	return members, nil
 }
 
 // AddPoolMember adds a node/member to the given pool. <member> must be in the form
